@@ -21,6 +21,10 @@ inputs:
     required: true
     description: 'something'
     default: ${{ job.container.network }}
+  workspace:
+    required: true
+    description: 'something something'
+    default: ${{ github.workspace }}
 outputs:
   build-id:
     description: 'The build identifier for this run.'
@@ -30,7 +34,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ GITHUB_WORKSPACE }}
+    - ${{ inputs.workspace }}
     - ${{ inputs.network }}
     - ${{ inputs.environment_username }}
     - ${{ inputs.environment_password }}
