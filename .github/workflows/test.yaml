@@ -1,0 +1,28 @@
+name: Docker Run Action Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run docker action and set output for testing
+        uses: ./
+        id: run-docker
+        with:
+          environment_image: docker:20.10.3
+          command: |
+            echo "::set-output name=docker-version::`echo $DOCKER_VERSION`"
+      - name: Test the output
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const dockerVersion = '${{ steps.run-docker.outputs.docker-version }}';
+            if (dockerVersion !== '20.10.3') {
+              core.setFailed(`Smoke Test Failed`);
+            }

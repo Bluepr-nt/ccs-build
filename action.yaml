@@ -1,0 +1,35 @@
+# action.yml
+name: 'ccs-build'
+description: 'Backbone implementation of the build task as per the [CI-CD-Standard](https://github.com/13013SwagR/CI-CD-Standard)'
+inputs:
+  environment_username:
+    description: 'Username'
+    required: false
+  environment_password:
+    description: 'Password'
+    required: false
+  environment_registry:
+    description: 'Registry'
+    required: false
+  environment_image:
+    description: 'The environment in which to execute the build command'
+    required: true
+  command:
+    description: 'The build command'
+    required: true
+outputs:
+  build-id:
+    description: 'The build identifier for this run.'
+  artifacts:
+    description: 'Array of artifacts location containing there respective build identifier (<build-id>-<artifact_name>)'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ github.workspace }}
+    - ${{ job.container.network }}
+    - ${{ inputs.environment_username }}
+    - ${{ inputs.environment_password }}
+    - ${{ inputs.environment_image }}
+    - ${{ inputs.command }}
+
