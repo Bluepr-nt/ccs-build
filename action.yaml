@@ -17,10 +17,6 @@ inputs:
   command:
     description: 'The build command'
     required: true
-  network:
-    required: true
-    description: 'something'
-    default: ${{ job.container.network }}
   workspace:
     required: true
     description: 'something something'
@@ -35,7 +31,6 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.workspace }}
-    - ${{ inputs.network }}
     - ${{ inputs.environment_username }}
     - ${{ inputs.environment_password }}
     - ${{ inputs.environment_image }}
