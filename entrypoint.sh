@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 echo ENV: $ENV
 if [ ! -z $INPUT_USERNAME ];
