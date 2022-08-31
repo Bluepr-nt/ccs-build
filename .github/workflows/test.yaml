@@ -16,8 +16,7 @@ jobs:
         id: run-docker
         with:
           environment_image: ubuntu:20.04
-          command: |
-            /bin/bash -c echo "::set-output name=docker-version::test"
+          command: echo "::set-output name=docker-version::test"
       - name: Test the output
         uses: actions/github-script@v3
         with:

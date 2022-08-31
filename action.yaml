@@ -21,6 +21,10 @@ inputs:
     required: true
     description: 'something something'
     default: ${{ github.workspace }}
+  shell:
+    required: true
+    description: 'The shell you want to execute the command in. Must be present in the environment image.'
+    default: sh
 outputs:
   build-id:
     description: 'The build identifier for this run.'
