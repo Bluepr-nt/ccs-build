@@ -15,7 +15,7 @@ jobs:
         uses: ./
         id: run-docker
         with:
-          environment_image: docker:20.10.3
+          environment_image: ubuntu:20.04
           command: |
             echo "::set-output name=docker-version::test"
       - name: Test the output
