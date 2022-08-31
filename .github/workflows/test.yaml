@@ -17,12 +17,12 @@ jobs:
         with:
           environment_image: docker:20.10.3
           command: |
-            echo "::set-output name=docker-version::`echo $DOCKER_VERSION`"
+            echo "::set-output name=docker-version::test"
       - name: Test the output
         uses: actions/github-script@v3
         with:
           script: |
             const dockerVersion = '${{ steps.run-docker.outputs.docker-version }}';
-            if (dockerVersion !== '20.10.3') {
+            if (dockerVersion !== 'test') {
               core.setFailed(`Smoke Test Failed`);
             }
