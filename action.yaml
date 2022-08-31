@@ -32,7 +32,6 @@ outputs:
     description: the execution log artifact (URL)
   pipeline_artifacts:
     description: the pipeline artifacts (URL), contains the builds produced and the main build number
-
   build-id:
     description: 'The build identifier for this run.'
   artifacts:
