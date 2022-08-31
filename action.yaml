@@ -34,5 +34,6 @@ runs:
     - ${{ inputs.environment_username }}
     - ${{ inputs.environment_password }}
     - ${{ inputs.environment_image }}
+    - ${{ inputs.environment_registry }}
     - ${{ inputs.command }}
 
