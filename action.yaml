@@ -40,4 +40,6 @@ runs:
     - ${{ inputs.environment_image }}
     - ${{ inputs.environment_registry }}
     - ${{ inputs.command }}
+    - ${{ inputs.shell }}
+
 
