@@ -2,6 +2,9 @@
 name: 'ccs-build'
 description: 'Backbone implementation of the build task as per the [CI-CD-Standard](https://github.com/13013SwagR/CI-CD-Standard)'
 inputs:
+  command:
+    description: 'The build command, MUST produce an artifact'
+    required: true
   environment_username:
     description: 'Username'
     required: false
@@ -14,9 +17,6 @@ inputs:
   environment_image:
     description: 'The environment in which to execute the build command'
     required: true
-  command:
-    description: 'The build command'
-    required: true
   workspace:
     required: true
     description: 'something something'
@@ -26,6 +26,13 @@ inputs:
     description: 'The shell you want to execute the command in. Must be present in the environment image.'
     default: sh
 outputs:
+  result_code:
+    description: 'the result code(integer)'
+  execution_log:
+    description: the execution log artifact (URL)
+  pipeline_artifacts:
+    description: the pipeline artifacts (URL), contains the builds produced and the main build number
+
   build-id:
     description: 'The build identifier for this run.'
   artifacts:
@@ -42,4 +49,8 @@ runs:
     - ${{ inputs.command }}
     - ${{ inputs.shell }}
 
+
+# TODO: Implement output "result_code"
+# TODO: Implement output "execution_log"
+# TODO: Implement output "pipeline_artifacts"
 
