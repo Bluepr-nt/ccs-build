@@ -5,6 +5,9 @@ inputs:
   command:
     description: 'The build command, MUST produce an artifact'
     required: true
+  environment_image:
+    description: 'The environment in which to execute the build command'
+    required: true
   environment_username:
     description: 'Username'
     required: false
@@ -14,9 +17,10 @@ inputs:
   environment_registry:
     description: 'Registry'
     required: false
-  environment_image:
-    description: 'The environment in which to execute the build command'
-    required: true
+  environment_workdir:
+    description: 'The working directory inside the environment image, also the path to the copied Github workspace directory'
+    required: false
+    default: '/var/www'
   workspace:
     required: true
     description: 'something something'
@@ -40,12 +44,13 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.workspace }}
+    - ${{ inputs.command }}
+    - ${{ inputs.environment_image }}
     - ${{ inputs.environment_username }}
     - ${{ inputs.environment_password }}
-    - ${{ inputs.environment_image }}
     - ${{ inputs.environment_registry }}
-    - ${{ inputs.command }}
+    - ${{ inputs.environment_workdir }}
+    - ${{ inputs.workspace }}
     - ${{ inputs.shell }}
 
 
