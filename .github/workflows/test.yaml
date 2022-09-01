@@ -6,25 +6,28 @@ on:
       - main
   pull_request:
 
+env:
+  ARTIFACT_NAME: ccs-build-action
 jobs:
   result_code_test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Test that the action is returning a zero exit code
+    - name: Assert the action is returning exit code 0
       uses: ./
       id: run-docker
       with:
         environment_image: alpine:3.16.2
         command: echo "::set-output name=alpine-version::`cat /etc/alpine-release`"
     - name: Test the output
-      uses: actions/github-script@v3
-      with:
-        script: |
-          const resultCode = '${{ steps.run-docker.outputs.result_code }}';
-          if (resultCode !== '0') {
-            core.setFailed(`result_code_test Failed`);
-          }
+      run: |
+        python3 <<EOF
+        resultCode = ${{ steps.run-docker.outputs.result_code }}
+        if resultCode != 0:
+          print(resultCode)
+          print("result_code_test Failed")
+          exit(1)
+        EOF
   pipeline_artifacts_test:
     runs-on: ubuntu-latest
     steps:
@@ -35,11 +38,14 @@ jobs:
       with:
         environment_image: alpine:3.16.2
         command: echo "my new build !@#$%^&*()_+{}[]" > build.txt
+        artifact_name: ${{ env.ARTIFACT_NAME }}-pipeline_artifacts_test
     - name: Test the output
-      uses: actions/github-script@v3
-      with:
-        script: |
-          const resultCode = '${{ steps.run-docker.outputs.pipeline_artifacts }}';
-          if (resultCode !== '0') {
-            core.setFailed(`pipeline_artifacts_test Failed`);
-          }
+      run: |
+        python3 <<EOF
+        print("test")
+        pipeline_artifacts = '${{ steps.run-docker.outputs.pipeline_artifacts }}'
+        print(f'pipeline_artifacts: ${pipeline_artifacts}')
+        if pipeline_artifacts != 'test':
+          print("pipeline_artifacts_test Failed")
+          exit(1)
+        EOF
