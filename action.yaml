@@ -49,7 +49,9 @@ runs:
     - ${{ inputs.shell }}
 
 
-# TODO: Implement output "result_code"
 # TODO: Implement output "execution_log"
+#  Get exec log
+#  Upload to artifact storage
+
 # TODO: Implement output "pipeline_artifacts"
 
