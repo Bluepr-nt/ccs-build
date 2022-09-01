@@ -44,7 +44,7 @@ jobs:
         python3 <<EOF
         print("test")
         pipeline_artifacts = '${{ steps.run-docker.outputs.pipeline_artifacts }}'
-        print(f'pipeline_artifacts: ${pipeline_artifacts}')
+        print(f'pipeline_artifacts: {pipeline_artifacts}')
         if pipeline_artifacts != 'test':
           print("pipeline_artifacts_test Failed")
           exit(1)
