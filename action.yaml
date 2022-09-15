@@ -19,12 +19,16 @@ inputs:
     required: false
   environment_workdir:
     description: 'The working directory inside the environment image, also the path to the copied Github workspace directory'
-    required: false
-    default: '/var/www'
-  workspace:
     required: true
-    description: 'something something'
-    default: ${{ github.workspace }}
+    default: '/var/www'
+  pipeline_artifacts_path:
+    description: |
+      The folder path containing the generated build artifacts
+      Is child of environment_workdir
+      Every first level folders and files will be treated as separate artifacts
+      Folders will be compressed to tar.gz
+    required: true
+    default: pipeline_artifacts
   shell:
     required: true
     description: 'The shell you want to execute the command in. Must be present in the environment image.'
@@ -50,7 +54,7 @@ runs:
     - ${{ inputs.environment_password }}
     - ${{ inputs.environment_registry }}
     - ${{ inputs.environment_workdir }}
-    - ${{ inputs.workspace }}
+    - ${{ inputs.pipeline_artifacts_path }}
     - ${{ inputs.shell }}
 
 

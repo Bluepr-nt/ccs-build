@@ -37,7 +37,7 @@ jobs:
       id: run-docker
       with:
         environment_image: alpine:3.16.2
-        command: echo "my new build !@#$%^&*()_+{}[]" > build.txt; ls -al
+        command: echo "my new build !@#$%^&*()_+{}[]" > pipeline_artifacts/build.txt; ls -al pipeline_artifacts
         artifact_name: ${{ env.ARTIFACT_NAME }}-pipeline_artifacts_test
     - name: Test the output
       run: |
@@ -45,7 +45,7 @@ jobs:
         print("test")
         pipeline_artifacts = '${{ steps.run-docker.outputs.pipeline_artifacts }}'
         print(f'pipeline_artifacts: ${{ steps.run-docker.outputs.pipeline_artifacts }}')
-        if pipeline_artifacts != 'test':
+        if pipeline_artifacts != 'build.txt':
           print("pipeline_artifacts_test Failed")
           exit(1)
         EOF
