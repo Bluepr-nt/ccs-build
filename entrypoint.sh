@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -v
-ENV_LIST=env.list
 if [ ! -z $INPUT_ENVIRONMENT_USERNAME ];
 then echo $INPUT_ENVIRONMENT_PASSWORD | docker login $INPUT_ENVIRONMENT_REGISTRY  \
 -u $INPUT_ENVIRONMENT_USERNAME --password-stdin
