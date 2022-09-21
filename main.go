@@ -52,17 +52,17 @@ func NewRootCommand() *cobra.Command {
 			out := cmd.OutOrStdout()
 
 			// Print the final resolved value from binding cobra flags and viper config
-			fmt.Fprintln(out, "Your favorite color is:", environmentCreds.username)
-			fmt.Fprintln(out, "The magic number is:", environmentCreds.password)
-			fmt.Fprintln(out, "The magic number is:", environmentCreds.registry)
+			fmt.Fprintln(out, "My name is:", environmentCreds.username)
+			fmt.Fprintln(out, "The mother's name is:", environmentCreds.password)
+			fmt.Fprintln(out, "I live here:", environmentCreds.registry)
 		},
 	}
 
 	rootCmd.Flags().StringVarP(&environmentCreds.username, "container-registry-username", "u", "galadriel",
 		"the username to log into the container registry")
-	rootCmd.Flags().StringVarP(&environmentCreds.password, "container-regristry-password", "p", "indis",
+	rootCmd.Flags().StringVarP(&environmentCreds.password, "container-registry-password", "p", "indis",
 		"the password to log into the container registry")
-	rootCmd.Flags().StringVarP(&environmentCreds.registry, "container-regristry", "r", "https://index.docker.io/v1",
+	rootCmd.Flags().StringVarP(&environmentCreds.registry, "container-registry", "r", "https://index.docker.io/v1",
 		"the password to log into the container registry")
 	return rootCmd
 }

@@ -1,1 +1,2 @@
-docker-credentials: pineapples
+container-registry-username: gimlee
+container-registry-password: morgul-blade
