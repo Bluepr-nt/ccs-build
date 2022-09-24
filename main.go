@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"ccs-build.thephoenixhomelab.com/services"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -30,15 +32,10 @@ func main() {
 }
 
 func NewRootCommand() *cobra.Command {
-	// Store the result of binding cobra flags and viper config. In a
-	// real application these would be data structures, most likely
-	// custom structs per command. This is simplified for the demo app and is
-	// not recommended that you use one-off variables. The point is that we
-	// aren't retrieving the values directly from viper or flags, we read the values
-	// from standard Go data structures.
-	environmentCreds := environmentRegistry{}
 
-	// Define our command
+	envCreds := environmentRegistry{}
+
+	// "For Frodo." - Aragorn II
 	rootCmd := &cobra.Command{
 		Use:   "build",
 		Short: "CICD Standard build task implementation.",
@@ -52,17 +49,20 @@ func NewRootCommand() *cobra.Command {
 			out := cmd.OutOrStdout()
 
 			// Print the final resolved value from binding cobra flags and viper config
-			fmt.Fprintln(out, "My name is:", environmentCreds.username)
-			fmt.Fprintln(out, "The mother's name is:", environmentCreds.password)
-			fmt.Fprintln(out, "I live here:", environmentCreds.registry)
+			fmt.Fprintln(out, "My name is:", envCreds.username)
+			fmt.Fprintln(out, "The mother's name is:", envCreds.password)
+			fmt.Fprintln(out, "I live here:", envCreds.registry)
+			if envCreds.username != "" {
+				services.Login(envCreds.username, envCreds.password, envCreds.registry)
+			}
 		},
 	}
 
-	rootCmd.Flags().StringVarP(&environmentCreds.username, "container-registry-username", "u", "galadriel",
+	rootCmd.Flags().StringVarP(&envCreds.username, "container-registry-username", "u", "galadriel",
 		"the username to log into the container registry")
-	rootCmd.Flags().StringVarP(&environmentCreds.password, "container-registry-password", "p", "indis",
+	rootCmd.Flags().StringVarP(&envCreds.password, "container-registry-password", "p", "indis",
 		"the password to log into the container registry")
-	rootCmd.Flags().StringVarP(&environmentCreds.registry, "container-registry", "r", "https://index.docker.io/v1",
+	rootCmd.Flags().StringVarP(&envCreds.registry, "container-registry", "r", "https://index.docker.io/v1",
 		"the password to log into the container registry")
 	return rootCmd
 }
