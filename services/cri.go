@@ -1,14 +1,19 @@
 package services
 
 import (
-	docker "github.com/docker/docker/client"
+	"context"
+	"fmt"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
+	// docker "github.com/docker/docker/client"
 )
 
 type CriClient interface {
 }
 
 type ContainerRuntimeInterface interface {
-
+	Login(username, password, registry string)
 }
 
 type Cri struct {
@@ -29,8 +34,9 @@ func NewCriService(engineType string) ContainerRuntimeInterface {
 	for _, container := range containers {
 		fmt.Printf("%s %s\n", container.ID[:10], container.Image)
 	}
+	return &Cri{}
 }
 
 func (cri *Cri) Login(username, password, registry string) {
-  docker.
+	// docker.
 }

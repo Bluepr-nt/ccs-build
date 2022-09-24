@@ -45,6 +45,7 @@ func NewRootCommand() *cobra.Command {
 			return initializeConfig(cmd)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
+			cri := services.NewCriService("docker")
 			// Working with OutOrStdout/OutOrStderr allows us to unit test our command easier
 			out := cmd.OutOrStdout()
 
@@ -53,7 +54,8 @@ func NewRootCommand() *cobra.Command {
 			fmt.Fprintln(out, "The mother's name is:", envCreds.password)
 			fmt.Fprintln(out, "I live here:", envCreds.registry)
 			if envCreds.username != "" {
-				services.Login(envCreds.username, envCreds.password, envCreds.registry)
+				cri.Login(envCreds.username, envCreds.password, envCreds.registry)
+
 			}
 		},
 	}

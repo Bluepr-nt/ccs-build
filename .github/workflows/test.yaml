@@ -9,6 +9,16 @@ on:
 env:
   ARTIFACT_NAME: ccs-build-action
 jobs:
+  unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.17.0'
+      - run: go version
+      - name: Run go unit Tests
+        run: go test
   result_code_test:
     runs-on: ubuntu-latest
     steps:
