@@ -45,7 +45,10 @@ func NewRootCommand() *cobra.Command {
 			return initializeConfig(cmd)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			cri := services.NewCriService("docker")
+			cri, err := services.NewCriService("docker")
+			if err != nil {
+				panic(fmt.Errorf("error initializing CRI service: %w", err))
+			}
 			// Working with OutOrStdout/OutOrStderr allows us to unit test our command easier
 			out := cmd.OutOrStdout()
 
