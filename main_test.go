@@ -79,3 +79,23 @@ I live here: https://index.docker.io/v1
 		assert.Equal(t, wantOutput, gotOutput, "expected the number to use the flag value and the color to use the flag default")
 	})
 }
+
+func TestSanitizeInputs(t *testing.T) {
+	type args struct {
+		envCreds *environmentRegistry
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := SanitizeInputs(tt.args.envCreds); (err != nil) != tt.wantErr {
+				t.Errorf("SanitizeInputs() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

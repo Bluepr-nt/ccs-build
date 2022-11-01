@@ -6,10 +6,11 @@ import (
 	"strings"
 
 	"ccs-build.thephoenixhomelab.com/services"
-
+	"github.com/go-sanitize/sanitize"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	klog "k8s.io/klog/v2"
 )
 
 // parse flags
@@ -19,9 +20,9 @@ const (
 )
 
 type environmentRegistry struct {
-	username string
-	password string
-	registry string
+	username string `san:"trim,max=64"`
+	password string `san:"trim,max=256"`
+	registry string `san:"trim"`
 }
 
 func main() {
@@ -34,6 +35,7 @@ func main() {
 func NewRootCommand() *cobra.Command {
 
 	envCreds := environmentRegistry{}
+	klog.InitFlags(nil)
 
 	// "For Frodo." - Aragorn II
 	rootCmd := &cobra.Command{
@@ -45,20 +47,26 @@ func NewRootCommand() *cobra.Command {
 			return initializeConfig(cmd)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			cri, err := services.NewCriService("docker")
+			if err := SanitizeInputs(&envCreds); err != nil {
+				klog.Errorf("CLI argument error: %w", err)
+				panic(envCreds)
+			}
+
+			ctnrSvc, err := services.NewCntrSvc("docker")
 			if err != nil {
 				panic(fmt.Errorf("error initializing CRI service: %w", err))
 			}
 			// Working with OutOrStdout/OutOrStderr allows us to unit test our command easier
-			out := cmd.OutOrStdout()
+			klog.SetOutput(cmd.OutOrStdout())
 
 			// Print the final resolved value from binding cobra flags and viper config
-			fmt.Fprintln(out, "My name is:", envCreds.username)
-			fmt.Fprintln(out, "The mother's name is:", envCreds.password)
-			fmt.Fprintln(out, "I live here:", envCreds.registry)
+			// fmt.Fprintln(out, "My name is:", envCreds.username)
+			// fmt.Fprintln(out, "The mother's name is:", envCreds.password)
+			// fmt.Fprintln(out, "I live here:", envCreds.registry)
 			if envCreds.username != "" {
-				cri.Login(envCreds.username, envCreds.password, envCreds.registry)
-
+				ctnrSvc.Login(envCreds.username, envCreds.password, envCreds.registry)
+			} else {
+				klog.Info("no container registry")
 			}
 		},
 	}
@@ -70,6 +78,16 @@ func NewRootCommand() *cobra.Command {
 	rootCmd.Flags().StringVarP(&envCreds.registry, "container-registry", "r", "https://index.docker.io/v1",
 		"the password to log into the container registry")
 	return rootCmd
+}
+
+func SanitizeInputs(envCreds *environmentRegistry) (err error) {
+	sanitzr, err := sanitize.New()
+	if err != nil {
+		return err
+	}
+
+	err = sanitzr.Sanitize(envCreds)
+	return err
 }
 
 func initializeConfig(cmd *cobra.Command) error {

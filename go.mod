@@ -4,11 +4,13 @@ go 1.18
 
 require (
 	github.com/docker/docker v20.10.18+incompatible
+	github.com/go-sanitize/sanitize v1.0.1
 	github.com/golang/mock v1.6.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.13.0
 	github.com/stretchr/testify v1.8.0
+	k8s.io/klog/v2 v2.80.1
 )
 
 require (
@@ -18,6 +20,7 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
+	github.com/go-logr/logr v1.2.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
