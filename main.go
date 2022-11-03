@@ -20,9 +20,9 @@ const (
 )
 
 type environmentRegistry struct {
-	username string `san:"trim,max=64"`
-	password string `san:"trim,max=256"`
-	registry string `san:"trim"`
+	Username string `san:"trim,max=64"`
+	Password string `san:"trim,max=256"`
+	Registry string `san:"trim"`
 }
 
 func main() {
@@ -63,19 +63,19 @@ func NewRootCommand() *cobra.Command {
 			// fmt.Fprintln(out, "My name is:", envCreds.username)
 			// fmt.Fprintln(out, "The mother's name is:", envCreds.password)
 			// fmt.Fprintln(out, "I live here:", envCreds.registry)
-			if envCreds.username != "" {
-				ctnrSvc.Login(envCreds.username, envCreds.password, envCreds.registry)
+			if envCreds.Username != "" {
+				ctnrSvc.Login(envCreds.Username, envCreds.Password, envCreds.Registry)
 			} else {
 				klog.Info("no container registry")
 			}
 		},
 	}
 
-	rootCmd.Flags().StringVarP(&envCreds.username, "container-registry-username", "u", "galadriel",
+	rootCmd.Flags().StringVarP(&envCreds.Username, "container-registry-username", "u", "galadriel",
 		"the username to log into the container registry")
-	rootCmd.Flags().StringVarP(&envCreds.password, "container-registry-password", "p", "indis",
+	rootCmd.Flags().StringVarP(&envCreds.Password, "container-registry-password", "p", "indis",
 		"the password to log into the container registry")
-	rootCmd.Flags().StringVarP(&envCreds.registry, "container-registry", "r", "https://index.docker.io/v1",
+	rootCmd.Flags().StringVarP(&envCreds.Registry, "container-registry", "r", "https://index.docker.io/v1",
 		"the password to log into the container registry")
 	return rootCmd
 }

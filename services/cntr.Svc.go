@@ -7,6 +7,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
 	docker "github.com/docker/docker/client"
+	"k8s.io/klog/v2"
 )
 
 //go:generate mockgen -source=cri.go -destination=mocks/mock_services.go -package=mocks . Cri
@@ -25,12 +26,14 @@ type CntrSvc struct {
 func NewCntrSvc(engineType string) (CntrSvcI, error) {
 	client, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
-		panic(err)
+		klog.Errorf("couldn't create a new docker client %w", err)
+		return &CntrSvc{}, err
 	}
 
 	containers, err := client.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
-		panic(err)
+		klog.Errorf("coudn't list containers %w", err)
+		return &CntrSvc{}, err
 	}
 
 	for _, container := range containers {
