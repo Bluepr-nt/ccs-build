@@ -51,10 +51,10 @@ func NewRootCommand() *cobra.Command {
 				klog.Errorf("CLI argument error: %w", err)
 				panic(envCreds)
 			}
-
-			ctnrSvc, err := services.NewCntrSvc("docker")
+			// container service should take arg and have docker as default
+			ctnrSvc, err := newCntrSvc()
 			if err != nil {
-				panic(fmt.Errorf("error initializing CRI service: %w", err))
+				klog.Errorf("error initializing CRI service: %w", err)
 			}
 			// Working with OutOrStdout/OutOrStderr allows us to unit test our command easier
 			klog.SetOutput(cmd.OutOrStdout())
@@ -78,6 +78,11 @@ func NewRootCommand() *cobra.Command {
 	rootCmd.Flags().StringVarP(&envCreds.Registry, "container-registry", "r", "https://index.docker.io/v1",
 		"the password to log into the container registry")
 	return rootCmd
+}
+
+func newCntrSvc() (services.CntrSvcI, error) {
+	ctnrSvc, err := services.NewCntrSvc("docker")
+	return ctnrSvc, err
 }
 
 func SanitizeInputs(envCreds *environmentRegistry) (err error) {

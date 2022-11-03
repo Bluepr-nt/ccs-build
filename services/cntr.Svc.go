@@ -43,9 +43,9 @@ func NewCntrSvc(engineType string) (CntrSvcI, error) {
 	return &newCri, nil
 }
 
-func (cri *CntrSvc) Login(username, password, registry string) error {
+func (cntrSvc *CntrSvc) Login(username, password, registry string) error {
 	auth := types.AuthConfig{}
-	resp, err := cri.client.RegistryLogin(nil, auth)
+	resp, err := cntrSvc.client.RegistryLogin(nil, auth)
 	if err != nil {
 		return fmt.Errorf("error trying to login to container registry, error: %w, response: %v", err, resp)
 	}

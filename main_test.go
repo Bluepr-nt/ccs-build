@@ -33,6 +33,7 @@ func TestPrecedence(t *testing.T) {
 		// Run ./stingoftheviper
 		cmd := NewRootCommand()
 		output := &bytes.Buffer{}
+		cmd.SetArgs([]string{})
 		cmd.SetOut(output)
 		cmd.Execute()
 
