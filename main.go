@@ -25,6 +25,11 @@ type environmentRegistry struct {
 	Registry string `san:"trim"`
 }
 
+type config struct {
+	envCreds environmentRegistry
+	dryRun   bool
+}
+
 func main() {
 	cmd := NewRootCommand()
 	if err := cmd.Execute(); err != nil {
@@ -34,7 +39,10 @@ func main() {
 
 func NewRootCommand() *cobra.Command {
 
-	envCreds := environmentRegistry{}
+	config := config{
+		envCreds: environmentRegistry{},
+		dryRun:   false,
+	}
 	klog.InitFlags(nil)
 
 	// "For Frodo." - Aragorn II
@@ -47,12 +55,12 @@ func NewRootCommand() *cobra.Command {
 			return initializeConfig(cmd)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := SanitizeInputs(&envCreds); err != nil {
+			if err := SanitizeInputs(&config.envCreds); err != nil {
 				klog.Errorf("CLI argument error: %w", err)
-				panic(envCreds)
+				panic(config.envCreds)
 			}
 			// container service should take arg and have docker as default
-			ctnrSvc, err := newCntrSvc()
+			ctnrSvc, err := newCntrSvc(config.dryRun)
 			if err != nil {
 				klog.Errorf("error initializing CRI service: %w", err)
 			}
@@ -63,24 +71,26 @@ func NewRootCommand() *cobra.Command {
 			// fmt.Fprintln(out, "My name is:", envCreds.username)
 			// fmt.Fprintln(out, "The mother's name is:", envCreds.password)
 			// fmt.Fprintln(out, "I live here:", envCreds.registry)
-			if envCreds.Username != "" {
-				ctnrSvc.Login(envCreds.Username, envCreds.Password, envCreds.Registry)
+			if config.envCreds.Username != "" {
+				ctnrSvc.Login(config.envCreds.Username, config.envCreds.Password, config.envCreds.Registry)
 			} else {
 				klog.Info("no container registry")
 			}
 		},
 	}
 
-	rootCmd.Flags().StringVarP(&envCreds.Username, "container-registry-username", "u", "galadriel",
+	rootCmd.Flags().StringVarP(&config.envCreds.Username, "container-registry-username", "u", "galadriel",
 		"the username to log into the container registry")
-	rootCmd.Flags().StringVarP(&envCreds.Password, "container-registry-password", "p", "indis",
+	rootCmd.Flags().StringVarP(&config.envCreds.Password, "container-registry-password", "p", "indis",
 		"the password to log into the container registry")
-	rootCmd.Flags().StringVarP(&envCreds.Registry, "container-registry", "r", "https://index.docker.io/v1",
+	rootCmd.Flags().StringVarP(&config.envCreds.Registry, "container-registry", "r", "https://index.docker.io/v1",
 		"the password to log into the container registry")
+	rootCmd.Flags().BoolVar(&config.dryRun, "dry-run", false,
+		"Execute the command in dry-run mode")
 	return rootCmd
 }
 
-func newCntrSvc() (services.CntrSvcI, error) {
+func newCntrSvc(dryRun bool) (services.CntrSvcI, error) {
 	ctnrSvc, err := services.NewCntrSvc("docker")
 	return ctnrSvc, err
 }

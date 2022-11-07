@@ -33,7 +33,7 @@ func TestPrecedence(t *testing.T) {
 		// Run ./stingoftheviper
 		cmd := NewRootCommand()
 		output := &bytes.Buffer{}
-		cmd.SetArgs([]string{})
+		cmd.SetArgs([]string{"--dry-run"})
 		cmd.SetOut(output)
 		cmd.Execute()
 
