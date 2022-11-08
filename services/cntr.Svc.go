@@ -15,6 +15,16 @@ type CntrClient interface {
 	RegistryLogin(ctx context.Context, auth types.AuthConfig) (registry.AuthenticateOKBody, error)
 }
 
+type DryCntrClient struct {
+	Username string
+	Password string
+	Registry string
+}
+
+func (client *DryCntrClient) RegistryLogin(ctx context.Context, auth types.AuthConfig) (registry.AuthenticateOKBody, error) {
+	return registry.AuthenticateOKBody{}, nil
+}
+
 type CntrSvcI interface {
 	Login(username, password, registry string) error
 }
@@ -24,23 +34,31 @@ type CntrSvc struct {
 }
 
 func NewCntrSvc(engineType string) (CntrSvcI, error) {
-	client, err := docker.NewClientWithOpts(docker.FromEnv)
-	if err != nil {
-		klog.Errorf("couldn't create a new docker client %w", err)
-		return &CntrSvc{}, err
+	if engineType == "dry-run" {
+
+	} else if engineType == "docker" {
+		client, err := docker.NewClientWithOpts(docker.FromEnv)
+		if err != nil {
+			klog.Errorf("couldn't create a new docker client %w", err)
+			return &CntrSvc{}, err
+		} else {
+			newCri := CntrSvc{client: client}
+			return &newCri, nil
+		}
+
 	}
 
-	containers, err := client.ContainerList(context.Background(), types.ContainerListOptions{})
-	if err != nil {
-		klog.Errorf("coudn't list containers %w", err)
-		return &CntrSvc{}, err
-	}
+	// containers, err := client.ContainerList(context.Background(), types.ContainerListOptions{})
+	// if err != nil {
+	// 	klog.Errorf("coudn't list containers %w", err)
+	// 	return &CntrSvc{}, err
+	// }
 
-	for _, container := range containers {
-		fmt.Printf("%s %s\n", container.ID[:10], container.Image)
-	}
-	newCri := CntrSvc{client: client}
-	return &newCri, nil
+	// for _, container := range containers {
+	// 	fmt.Printf("%s %s\n", container.ID[:10], container.Image)
+	// }
+
+	return &CntrSvc{}, fmt.Errorf("the engine type specified is not supported; engine type: %s", engineType)
 }
 
 func (cntrSvc *CntrSvc) Login(username, password, registry string) error {

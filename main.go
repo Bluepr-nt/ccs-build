@@ -90,8 +90,15 @@ func NewRootCommand() *cobra.Command {
 	return rootCmd
 }
 
-func newCntrSvc(dryRun bool) (services.CntrSvcI, error) {
-	ctnrSvc, err := services.NewCntrSvc("docker")
+func newCntrSvc(dryRun bool, engine string) (services.CntrSvcI, error) {
+	if len(engine) == 0 {
+		engine = "docker"
+	}
+	if dryRun {
+		engine = "dry-run"
+	}
+	ctnrSvc, err := services.NewCntrSvc(engine)
+
 	return ctnrSvc, err
 }
 
