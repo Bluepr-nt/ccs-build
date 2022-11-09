@@ -26,6 +26,7 @@ func (client *DryCntrClient) RegistryLogin(ctx context.Context, auth types.AuthC
 }
 
 type CntrSvcI interface {
+	// Login to the preconfigured container engine
 	Login(username, password, registry string) error
 }
 
@@ -35,15 +36,17 @@ type CntrSvc struct {
 
 func NewCntrSvc(engineType string) (CntrSvcI, error) {
 	if engineType == "dry-run" {
+		client := DryCntrClient{}
+		return &CntrSvc{client: &client}, nil
 
 	} else if engineType == "docker" {
+
 		client, err := docker.NewClientWithOpts(docker.FromEnv)
 		if err != nil {
 			klog.Errorf("couldn't create a new docker client %w", err)
 			return &CntrSvc{}, err
 		} else {
-			newCri := CntrSvc{client: client}
-			return &newCri, nil
+			return &CntrSvc{client: client}, nil
 		}
 
 	}
@@ -61,12 +64,14 @@ func NewCntrSvc(engineType string) (CntrSvcI, error) {
 	return &CntrSvc{}, fmt.Errorf("the engine type specified is not supported; engine type: %s", engineType)
 }
 
+// Login to the preconfigured container engine
 func (cntrSvc *CntrSvc) Login(username, password, registry string) error {
 	auth := types.AuthConfig{}
 	resp, err := cntrSvc.client.RegistryLogin(nil, auth)
 	if err != nil {
 		return fmt.Errorf("error trying to login to container registry, error: %w, response: %v", err, resp)
 	}
+	klog.Infof("Successful login of %s to %s", username, registry)
 	return nil
 }
 

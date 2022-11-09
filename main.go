@@ -43,7 +43,7 @@ func NewRootCommand() *cobra.Command {
 		envCreds: environmentRegistry{},
 		dryRun:   false,
 	}
-	klog.InitFlags(nil)
+	// klog.InitFlags(nil)
 
 	// "For Frodo." - Aragorn II
 	rootCmd := &cobra.Command{
@@ -60,17 +60,14 @@ func NewRootCommand() *cobra.Command {
 				panic(config.envCreds)
 			}
 			// container service should take arg and have docker as default
-			ctnrSvc, err := newCntrSvc(config.dryRun)
+			ctnrSvc, err := newCntrSvc(config.dryRun, "")
 			if err != nil {
-				klog.Errorf("error initializing CRI service: %w", err)
+				klog.Errorf("error initializing Container service: %w", err)
+				panic("error initializing Container service")
 			}
 			// Working with OutOrStdout/OutOrStderr allows us to unit test our command easier
 			klog.SetOutput(cmd.OutOrStdout())
 
-			// Print the final resolved value from binding cobra flags and viper config
-			// fmt.Fprintln(out, "My name is:", envCreds.username)
-			// fmt.Fprintln(out, "The mother's name is:", envCreds.password)
-			// fmt.Fprintln(out, "I live here:", envCreds.registry)
 			if config.envCreds.Username != "" {
 				ctnrSvc.Login(config.envCreds.Username, config.envCreds.Password, config.envCreds.Registry)
 			} else {
