@@ -30,9 +30,8 @@ func TestPrecedence(t *testing.T) {
 		require.NoError(t, err, "error writing test config file")
 		defer os.Remove(filepath.Join(tmpDir, "ccs.yaml"))
 
-		// Run ./stingoftheviper
-		cmd := NewRootCommand()
 		output := &bytes.Buffer{}
+		cmd := NewRootCommand(output)
 		cmd.SetArgs([]string{"--dry-run"})
 		cmd.SetOut(output)
 		cmd.Execute()
@@ -50,9 +49,8 @@ I live here: https://index.docker.io/v1
 		os.Setenv("CCS_CONTAINER_REGISTRY_USERNAME", "sarouman")
 		defer os.Unsetenv("CCS_CONTAINER_REGISTRY_USERNAME")
 
-		cmd := NewRootCommand()
 		output := &bytes.Buffer{}
-		cmd.SetOut(output)
+		cmd := NewRootCommand(output)
 		cmd.Execute()
 
 		gotOutput := output.String()
@@ -66,8 +64,8 @@ I live here: https://index.docker.io/v1
 	// Set number with a flag
 	t.Run("flag", func(t *testing.T) {
 		// Run ./stingoftheviper --number 2
-		cmd := NewRootCommand()
 		output := &bytes.Buffer{}
+		cmd := NewRootCommand(output)
 		cmd.SetOut(output)
 		cmd.SetArgs([]string{"--container-registry-username", "sauron"})
 		cmd.Execute()

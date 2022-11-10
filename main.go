@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -31,13 +32,13 @@ type config struct {
 }
 
 func main() {
-	cmd := NewRootCommand()
+	cmd := NewRootCommand(nil)
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
-func NewRootCommand() *cobra.Command {
+func NewRootCommand(w io.Writer) *cobra.Command {
 
 	config := config{
 		envCreds: environmentRegistry{},
@@ -66,6 +67,7 @@ func NewRootCommand() *cobra.Command {
 				panic("error initializing Container service")
 			}
 			// Working with OutOrStdout/OutOrStderr allows us to unit test our command easier
+
 			klog.SetOutput(cmd.OutOrStdout())
 
 			if config.envCreds.Username != "" {
