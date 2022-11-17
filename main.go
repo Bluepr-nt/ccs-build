@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -11,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	klog "k8s.io/klog/v2"
+	"k8s.io/klog/v2"
 )
 
 // parse flags
@@ -32,19 +33,23 @@ type config struct {
 }
 
 func main() {
+	klog.InitFlags(nil)
+	flag.Set("logtostderr", "false")
+	flag.Set("alsologtostderr", "false")
+	flag.Parse()
+
 	cmd := NewRootCommand(nil)
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
-func NewRootCommand(w io.Writer) *cobra.Command {
+func NewRootCommand(output io.Writer) *cobra.Command {
 
 	config := config{
 		envCreds: environmentRegistry{},
 		dryRun:   false,
 	}
-	// klog.InitFlags(nil)
 
 	// "For Frodo." - Aragorn II
 	rootCmd := &cobra.Command{
@@ -56,6 +61,7 @@ func NewRootCommand(w io.Writer) *cobra.Command {
 			return initializeConfig(cmd)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
+			klog.SetOutput(output)
 			if err := SanitizeInputs(&config.envCreds); err != nil {
 				klog.Errorf("CLI argument error: %w", err)
 				panic(config.envCreds)
@@ -67,8 +73,11 @@ func NewRootCommand(w io.Writer) *cobra.Command {
 				panic("error initializing Container service")
 			}
 			// Working with OutOrStdout/OutOrStderr allows us to unit test our command easier
-
-			klog.SetOutput(cmd.OutOrStdout())
+			// if w == nil {
+			// 	klog.SetOutput(cmd.OutOrStdout())
+			// } else {
+			// 	klog.SetOutput(w)
+			// }
 
 			if config.envCreds.Username != "" {
 				ctnrSvc.Login(config.envCreds.Username, config.envCreds.Password, config.envCreds.Registry)

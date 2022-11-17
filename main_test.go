@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"k8s.io/klog/v2"
 )
 
 func TestPrecedence(t *testing.T) {
@@ -20,7 +22,11 @@ func TestPrecedence(t *testing.T) {
 	defer os.Chdir(testDir)
 	err = os.Chdir(tmpDir)
 	require.NoError(t, err, "error changing to the temporary test directory")
+	klog.InitFlags(nil)
 
+	flag.Set("logtostderr", "false")
+	flag.Set("alsologtostderr", "false")
+	flag.Parse()
 	// Set favorite-color with the config file
 	t.Run("config file", func(t *testing.T) {
 		// Copy the config file into our temporary test directory
@@ -30,18 +36,17 @@ func TestPrecedence(t *testing.T) {
 		require.NoError(t, err, "error writing test config file")
 		defer os.Remove(filepath.Join(tmpDir, "ccs.yaml"))
 
-		output := &bytes.Buffer{}
+		output := new(bytes.Buffer)
 		cmd := NewRootCommand(output)
 		cmd.SetArgs([]string{"--dry-run"})
 		cmd.SetOut(output)
 		cmd.Execute()
-
+		klog.Flush()
 		gotOutput := output.String()
-		wantOutput := `My name is: gimlee
-The mother's name is: morgul-blade
-I live here: https://index.docker.io/v1
-`
-		assert.Equal(t, wantOutput, gotOutput, "expected the color from the config file and the number from the flag default")
+		wantOutput := `Successful login of gimlee to https://index.docker.io/v1`
+		assert.Contains(t, gotOutput, wantOutput)
+
+		// assert.Equal(t, wantOutput, gotOutput, "expected the color from the config file and the number from the flag default")
 	})
 
 	// Set favorite-color with an environment variable
@@ -49,16 +54,17 @@ I live here: https://index.docker.io/v1
 		os.Setenv("CCS_CONTAINER_REGISTRY_USERNAME", "sarouman")
 		defer os.Unsetenv("CCS_CONTAINER_REGISTRY_USERNAME")
 
-		output := &bytes.Buffer{}
+		output := new(bytes.Buffer)
 		cmd := NewRootCommand(output)
+		cmd.SetArgs([]string{"--dry-run"})
+		cmd.SetOut(output)
 		cmd.Execute()
+		klog.Flush()
 
 		gotOutput := output.String()
-		wantOutput := `My name is: sarouman
-The mother's name is: indis
-I live here: https://index.docker.io/v1
-`
-		assert.Equal(t, wantOutput, gotOutput, "expected the color to use the environment variable value and the number to use the flag default")
+		wantOutput := `Successful login of sarouman to https://index.docker.io/v1`
+		assert.Contains(t, gotOutput, wantOutput)
+		// assert.Equal(t, wantOutput, gotOutput, "expected the color to use the environment variable value and the number to use the flag default")
 	})
 
 	// Set number with a flag
@@ -67,15 +73,14 @@ I live here: https://index.docker.io/v1
 		output := &bytes.Buffer{}
 		cmd := NewRootCommand(output)
 		cmd.SetOut(output)
-		cmd.SetArgs([]string{"--container-registry-username", "sauron"})
+		cmd.SetArgs([]string{"--container-registry-username", "sauron", "--dry-run"})
 		cmd.Execute()
-
+		klog.Flush()
 		gotOutput := output.String()
-		wantOutput := `My name is: sauron
-The mother's name is: indis
-I live here: https://index.docker.io/v1
-`
-		assert.Equal(t, wantOutput, gotOutput, "expected the number to use the flag value and the color to use the flag default")
+		wantOutput := `Successful login of sauron to https://index.docker.io/v1`
+		assert.Contains(t, gotOutput, wantOutput)
+
+		// assert.Equal(t, wantOutput, gotOutput, "expected the number to use the flag value and the color to use the flag default")
 	})
 }
 
