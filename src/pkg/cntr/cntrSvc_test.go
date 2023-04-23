@@ -1,9 +1,9 @@
-package services
+package cntr
 
 import (
 	"testing"
 
-	"ccs-build.thephoenixhomelab.com/services/mocks"
+	"ccs-build.thephoenixhomelab.com/pkg/cntr/mocks"
 	"github.com/golang/mock/gomock"
 )
 

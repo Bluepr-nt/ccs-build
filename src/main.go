@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"ccs-build.thephoenixhomelab.com/services"
+	"ccs-build.thephoenixhomelab.com/pkg/cntr"
 	"github.com/go-sanitize/sanitize"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -98,14 +98,14 @@ func NewRootCommand(output io.Writer) *cobra.Command {
 	return rootCmd
 }
 
-func newCntrSvc(dryRun bool, engine string) (services.CntrSvcI, error) {
+func newCntrSvc(dryRun bool, engine string) (cntr.CntrSvcI, error) {
 	if len(engine) == 0 {
 		engine = "docker"
 	}
 	if dryRun {
 		engine = "dry-run"
 	}
-	ctnrSvc, err := services.NewCntrSvc(engine)
+	ctnrSvc, err := cntr.NewCntrSvc(engine)
 
 	return ctnrSvc, err
 }
